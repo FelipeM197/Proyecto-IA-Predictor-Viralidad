@@ -1,107 +1,148 @@
-# Predictor de Viralidad Multimodal
+# Predictor de Engagement Acústico con IA
 
-Sistema de predicción de alcance e interacción (*engagement*) para publicaciones en redes sociales a partir de señales multimodales: **texto**, **imagen** y **música/audio**. El proyecto combina extracción matemática de características sobre medios crudos, modelos de árboles potenciados por gradiente (`XGBoost`) y un agente de lenguaje local (`Ollama`) que traduce las métricas predichas en recomendaciones editables antes de publicar.
+Sistema de predicción de alcance e interacción (*engagement*) para publicaciones en redes sociales a partir de señales de **audio y música**. El proyecto combina extracción matemática de señales acústicas mediante Procesamiento Digital de Señales (`librosa`), modelos propios de Machine Learning (`XGBoost`, `Random Forest`, `MLP`) y un agente de lenguaje local (`Ollama`) que traduce las métricas predichas en recomendaciones concretas de edición de sonido antes de publicar.
 
 ---
 
 ## 1. Propósito y Enfoque Técnico
 
-Entrenar una red neuronal profunda de extremo a extremo con audio, imagen y texto requiere miles de horas de cómputo y millones de muestras. Este proyecto resuelve el problema mediante **fusión tabular de características** (*Feature-Level Tabular Fusion*): cada modalidad pasa por un extractor especializado que resume la señal en variables numéricas interpretables.
+Entrenar una red neuronal profunda de extremo a extremo con audio crudo requiere miles de horas de cómputo y millones de muestras. Este proyecto resuelve el problema mediante **fusión tabular de características acústicas** (*Feature-Level Tabular Fusion*): el audio pasa por extractores matemáticos especializados que resumen la señal en variables numéricas interpretables (tempo, silencios iniciales, brillo espectral, energía RMS y coeficientes MFCC).
 
-Con esta matriz unificada, un modelo `XGBoost` estima la tasa de interacción esperada:
+Con esta matriz unificada, el modelo estima la tasa de interacción esperada:
 
 $$\text{Engagement Rate} = \frac{\text{Likes} + \text{Comments} + \text{Shares}}{\text{Views}}$$
 
-Una vez calculada la predicción y la importancia de cada variable, un modelo local ejecutado en `Ollama` (`Llama 3` o `Mistral`) recibe los valores fuera de rango respecto al percentil viral y redacta sugerencias concretas sobre el ritmo de la pista, la composición visual o la estructura del texto.
+Una vez calculada la predicción y el impacto de cada variable mediante explicabilidad (`SHAP`), un modelo local ejecutado en `Ollama` (`Llama 3` o `Mistral`) recibe las métricas que penalizaron la puntuación y redacta sugerencias prácticas de edición sonora.
 
 ---
 
-## 2. Arquitectura Beta del Sistema
-
-### 2.1 Flujo General de Procesamiento e Inferencia
+## 2. Arquitectura General del Sistema
 
 ```mermaid
 flowchart TD
-    subgraph Entrada["1. Entrada Multimodal del Usuario"]
-        T["Texto y Metadatos\n(Copy, hashtags, hora)"]
-        I["Imagen / Miniatura\n(Archivo .jpg / .png)"]
-        A["Pista de Audio\n(Archivo .mp3 / .wav)"]
-        V["Video Completo\n(Fase futura / Backlog)"]
+    subgraph Entrada["1. Entrada de Audio"]
+        URL["Enlace Web (YouTube / TikTok)"]
+        FILE["Archivo de Audio (.mp3 / .wav)"]
     end
 
-    subgraph Extraccion["2. Extracción de Características (Feature Engineering)"]
-        FE_T["Procesador NLP\nLongitud, conteo de hashtags,\npolaridad de sentimiento, franja horaria"]
-        FE_I["Procesador Visual (OpenCV / Pillow)\nBrillo, contraste, saturación HSV,\nitidez y proporción de color"]
-        FE_A["Procesador Acústico (Librosa)\nTempo (BPM), energía RMS,\ncentroide espectral, silencios iniciales"]
+    subgraph Ingesta["2. Ingesta y Validación"]
+        YTDL["yt-dlp (Descarga con timeout y captura de errores 404)"]
+        VAL["Validador de Integridad (>0 KB, formato de audio)"]
     end
 
-    subgraph Modelo["3. Motor Predictivo Tabular"]
-        M_U["Vector Tabular Unificado\nNormalización y escalado"]
-        XGB["Modelo XGBoost / Random Forest\nPredicción de Engagement Rate\ny cálculo de Feature Importance"]
+    subgraph DSP["3. Extracción Acústica (Librosa)"]
+        PRE["Preprocesador de Onda (Mono, 22050 Hz, 30s max)"]
+        RIT["Extractor de Ritmo (BPM, fuerza de pulso)"]
+        ENE["Extractor de Energía (RMS, silencio inicial, rango dinámico)"]
+        ESP["Extractor Espectral (Centroide, rolloff, cruces por cero)"]
+        MFC["Extractor Tímbrico (MFCCs 1-13, Chroma)"]
     end
 
-    subgraph Agente["4. Agente de Retroalimentación"]
-        Prompt["Constructor de Contexto\nCompara métricas del usuario vs. perfil viral"]
-        LLM["LLM Local (Ollama - Llama 3 / Mistral)\nGeneración de recomendaciones accionables"]
+    subgraph Modelos["4. Inferencia Predictiva Propia"]
+        ESC["Escalador Numérico (StandardScaler)"]
+        XGB["Modelo Predictor Propio (XGBoost / MLP)"]
+        SHAP["Explicabilidad SHAP (¿Qué suma y qué resta?)"]
     end
 
-    subgraph UI["5. Interfaz Interactiva"]
-        ST["Dashboard en Streamlit\nIndicador de viralidad, gráficos comparativos\ny panel de consejos de edición"]
+    subgraph Agente["5. Agente Asesor y UI"]
+        LLM["Agente Local (Ollama - Llama 3)"]
+        UI["Dashboard Interactivo en Streamlit"]
     end
 
-    T --> FE_T
-    I --> FE_I
-    A --> FE_A
-    V -. "Extracción diferida\n(frames + pista)" .-> Extraccion
-
-    FE_T --> M_U
-    FE_I --> M_U
-    FE_A --> M_U
-
-    M_U --> XGB
-    XGB --> Prompt
-    Prompt --> LLM
-    XGB --> ST
-    LLM --> ST
-```
-
-### 2.2 Pipeline de Datos y Entrenamiento (Offline)
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant K as Dataset (Kaggle / CSV)
-    participant D as Script de Ingesta (yt-dlp)
-    participant P as Extractores (NLP + Visión + Librosa)
-    participant X as Entrenamiento (Scikit-Learn / XGBoost)
-    participant A as Artefactos (.pkl / .json)
-
-    K->>D: Lectura de URLs, textos y métricas históricas
-    D->>D: Descarga de pistas (.mp3) y miniaturas (.jpg) con control de enlaces caídos
-    D->>P: Envío de archivos locales validados
-    P->>P: Cálculo de variables lingüísticas, cromáticas y espectrales
-    P->>X: Consolidación de matriz tabular por ID de publicación
-    X->>X: División Train/Test (80/20), ajuste de hiperparámetros y evaluación (RMSE / MAE)
-    X->>A: Exportación del modelo entrenado, escaladores y umbrales de referencia viral
+    URL --> YTDL --> VAL
+    FILE --> VAL
+    VAL --> PRE
+    PRE --> RIT & ENE & ESP & MFC
+    RIT & ENE & ESP & MFC --> ESC --> XGB
+    XGB --> SHAP --> LLM
+    XGB --> UI
+    LLM --> UI
 ```
 
 ---
 
-## 3. Componentes por Modalidad
+## 3. Principio de Parametrización Absoluta (Zero-Hardcoding)
 
-| Modalidad | Estado | Variables Extraídas | Herramientas Base |
-| :--- | :--- | :--- | :--- |
-| **Texto y Metadatos** | Fase Inicial | Conteo de palabras, densidad de hashtags, polaridad de sentimiento `[-1, 1]`, día de la semana y franja horaria. | `pandas`, `VADER` / `TextBlob` / `pysentimiento` |
-| **Música y Audio** | Fase Inicial | Tempo en pulsos por minuto (`BPM`), energía media (`RMS`), centroide espectral (brillo acústico) y segundos de silencio al inicio. | `librosa`, `yt-dlp`, `numpy` |
-| **Imagen / Portada** | Fase Inicial | Brillo medio, contraste, saturación en espacio `HSV`, nitidez por varianza del Laplaciano y dominancia cálida/fría. | `opencv-python`, `Pillow` |
-| **Video** | Fase Futura | Ritmo de cortes de escena, movimiento óptico en los primeros 3 segundos y subtítulos incrustados (OCR). | `opencv-python`, `scenedetect` |
+Para garantizar máxima flexibilidad y facilidad de modificación durante el desarrollo y la sustentación ante evaluadores, **ningún archivo de código fuente contiene números mágicos ni rutas fijas escritas a mano**.
+
+* Toda constante física, matemática, temporal y de modelado reside exclusivamente en:
+  * [`config/settings.py`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/config/settings.py) (Parámetros globales del sistema).
+  * [`.env`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/.env) (Variables locales del entorno).
+* **Beneficio directo:** Si un evaluador solicita cambiar la duración analizada de 30 a 15 segundos o modificar la frecuencia de muestreo de $22,050 \text{ Hz}$ a $44,100 \text{ Hz}$, se cambia **una única línea** en `settings.py` y todo el pipeline (extractores, escaladores y modelos) se adapta de inmediato.
 
 ---
 
-## 4. Funcionamiento Paso a Paso en Producción
+## 4. Componentes del Entorno y Archivos de Instalación
 
-1. **Carga de contenido:** El usuario ingresa desde la interfaz de `Streamlit` el texto de su publicación, la hora prevista de lanzamiento, la imagen o miniatura y el archivo de audio (`.mp3` o `.wav`).
-2. **Vectorización en tiempo real:** El backend procesa el texto, analiza el histograma de la imagen y descompone la onda de sonido con `librosa`. Todo el bloque se convierte en una fila numérica en menos de tres segundos.
-3. **Inferencia e interpretabilidad:** El modelo `XGBoost` devuelve el porcentaje estimado de `Engagement Rate` y ordena las variables según su peso en la decisión.
-4. **Diagnóstico con IA generativa:** Un módulo intermedio toma las variables que penalizaron la puntuación (por ejemplo, un silencio inicial mayor a dos segundos o un ritmo inferior a 95 BPM) y las inyecta en un prompt estructurado hacia `Ollama`.
-5. **Visualización:** La pantalla muestra el indicador de rendimiento estimado, un gráfico radial comparando la publicación contra el promedio de contenido viral y las correcciones sugeridas por el modelo de lenguaje.
+El entorno de desarrollo está modularizado con los siguientes archivos base:
+
+| Archivo | Tipo | ¿Qué hace y para qué sirve? |
+| :--- | :--- | :--- |
+| [`pyproject.toml`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/pyproject.toml) | Empaquetado Moderno (PEP 517/621) | Permite instalar el proyecto como paquete local editable (`pip install -e .`). Evita errores de `ModuleNotFoundError` al importar módulos de `src` desde cualquier carpeta o notebook. |
+| [`requirements.txt`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/requirements.txt) | Manifiesto de Dependencias | Lista todas las bibliotecas de Python con sus versiones congeladas (DSP, ML, UI, LLM y Testing) para asegurar reproducibilidad exacta en cualquier computadora. |
+| [`.env.example`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/.env.example) | Plantilla de Entorno | Documenta las variables de entorno configurables (puerto y modelo de Ollama, timeouts de red y duración de audio) sin exponer secretos ni datos locales en el control de versiones. |
+| [`config/settings.py`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/config/settings.py) | Núcleo de Configuración | Centraliza rutas dinámicas (`pathlib.Path`), parámetros de la Transformada de Fourier (`N_FFT`, `HOP_LENGTH`), tasa de muestreo y semillas aleatorias. |
+| [`config/logging_config.py`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/config/logging_config.py) | Sistema de Registro | Reemplaza llamadas informales a `print()` por un registro formal de eventos en consola y en el archivo rotativo `logs/sistema.log`. |
+| [`scripts/init_dirs.py`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/scripts/init_dirs.py) | Constructor de Carpetas | Script utilitario que asegura la existencia de los directorios de datos crudos, medios y modelos guardados en instalaciones nuevas. |
+| [`scripts/check_environment.py`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/scripts/check_environment.py) | Auditor de Diagnóstico | Verifica en segundos que Python sea $\ge 3.10$, que el binario de `FFmpeg` esté activo en el sistema y que el servidor de `Ollama` esté respondiendo. |
+
+---
+
+## 5. Tutorial de Instalación Paso a Paso
+
+Sigue estos pasos en tu terminal (PowerShell en Windows o Bash en Linux/macOS) para dejar el entorno 100% operativo:
+
+### Paso 1: Clonar el repositorio y entrar a la carpeta
+```bash
+git clone https://github.com/FelipeM197/Proyecto-IA-Predictor-Viralidad.git
+cd Proyecto-IA-Predictor-Viralidad
+```
+
+### Paso 2: Crear y activar el entorno virtual de Python
+```bash
+# Crear el entorno virtual (si no está creado)
+python -m venv .venv
+
+# Activar en Windows (PowerShell)
+.venv\Scripts\activate
+
+# Activar en Linux / macOS
+source .venv/bin/activate
+```
+
+### Paso 3: Instalar las dependencias del proyecto
+```bash
+# Instalar todas las librerías científicas, de audio, ML y UI
+pip install -r requirements.txt
+
+# Instalar el proyecto en modo editable (usando pyproject.toml)
+pip install -e .
+```
+
+### Paso 4: Configurar variables de entorno locales
+```bash
+# En Windows (PowerShell)
+Copy-Item .env.example .env
+
+# En Linux / macOS
+cp .env.example .env
+```
+
+### Paso 5: Auditar el entorno y dependencias del sistema
+Ejecuta el script de diagnóstico para verificar que `FFmpeg` y `Python` estén listos:
+```bash
+python scripts/check_environment.py
+```
+
+> [!NOTE]
+> **Requisito del Sistema (FFmpeg):** `yt-dlp` y `librosa` requieren el ejecutable de `FFmpeg` en el sistema. Si el script de diagnóstico indica que falta, instálalo en Windows ejecutando:
+> ```powershell
+> winget install Gyan.FFmpeg
+> ```
+> Y reinicia tu terminal.
+
+> [!TIP]
+> **Para el Agente de Lenguaje (Ollama):** Si deseas ejecutar las recomendaciones con LLM local, instala Ollama desde [ollama.com](https://ollama.com) y descarga el modelo Llama 3 ejecutando:
+> ```bash
+> ollama pull llama3
+> ```
