@@ -74,13 +74,13 @@ Para garantizar máxima flexibilidad y facilidad de modificación durante el des
 
 ## 4. Componentes del Entorno y Archivos de Instalación
 
-El entorno de desarrollo cuenta con los archivos base de instalación, y cada integrante implementará los módulos de configuración y scripts utilitarios:
+El repositorio contiene **únicamente los archivos declarativos de instalación y entorno**. La estructura de carpetas se conserva mediante archivos `.gitkeep`. **No contiene ningún archivo `.py`**, ya que cada script, paquete y módulo debe ser implementado y defendido por el integrante asignado:
 
 | Archivo | Estado / Tipo | ¿Qué hace y para qué sirve? |
 | :--- | :--- | :--- |
-| [`pyproject.toml`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/pyproject.toml) | **Base Instalada** (PEP 517/621) | Permite instalar el proyecto como paquete local editable (`pip install -e .`). Evita errores de `ModuleNotFoundError` al importar módulos de `src` desde cualquier carpeta o notebook. |
-| [`requirements.txt`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/requirements.txt) | **Base Instalada** (Dependencias) | Lista todas las bibliotecas de Python con sus versiones congeladas (DSP, ML, UI, LLM y Testing) para asegurar reproducibilidad exacta en cualquier computadora. |
-| [`.env.example`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/.env.example) | **Base Instalada** (Plantilla) | Documenta las variables de entorno configurables (puerto y modelo de Ollama, timeouts de red y duración de audio) sin exponer secretos ni datos locales en el control de versiones. |
+| [`pyproject.toml`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/pyproject.toml) | **Base Declarativa** (PEP 517/621) | Configuración de empaquetado editable (`pip install -e .`). Convierte la carpeta `src` en un paquete importable una vez creados los módulos. |
+| [`requirements.txt`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/requirements.txt) | **Base Declarativa** (Dependencias) | Lista todas las bibliotecas de Python con sus versiones congeladas (DSP, ML, UI, LLM y Testing) para asegurar reproducibilidad exacta en cualquier computadora. |
+| [`.env.example`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/.env.example) | **Base Declarativa** (Plantilla) | Documenta las variables de entorno configurables (puerto y modelo de Ollama, timeouts de red y duración de audio) sin exponer secretos ni datos locales en el control de versiones. |
 | `config/settings.py` | *Entregable Rol 1* (Configuración) | Centraliza rutas dinámicas (`pathlib.Path`), parámetros de la Transformada de Fourier (`N_FFT`, `HOP_LENGTH`), tasa de muestreo y semillas aleatorias. |
 | `config/logging_config.py` | *Entregable Rol 1* (Registro) | Reemplaza llamadas informales a `print()` por un registro formal de eventos en consola y en el archivo rotativo `logs/sistema.log`. |
 | `scripts/init_dirs.py` | *Entregable Rol 2* (Directorios) | Script utilitario que asegura la existencia de los directorios de datos crudos, medios y modelos guardados en instalaciones nuevas. |
