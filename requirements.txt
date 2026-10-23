@@ -1,0 +1,31 @@
+# ==============================================================================
+# DEPENDENCIAS DEL PROYECTO: Predictor de Engagement por Audio
+# ==============================================================================
+
+# Núcleo Numérico y Tabular
+numpy>=1.26.0
+pandas>=2.1.0
+scipy>=1.11.0
+pyarrow>=15.0.0
+
+# Ingesta y Procesamiento Digital de Señales (DSP)
+yt-dlp>=2024.08.01
+librosa>=0.10.1
+soundfile>=0.12.1
+
+# Machine Learning y Modelos Propios
+scikit-learn>=1.4.0
+xgboost>=2.0.0
+shap>=0.44.0
+joblib>=1.3.2
+
+# Agente LLM y Diagnóstico Local (Ollama)
+ollama>=0.1.7
+
+# Interfaz Web y Visualizaciones Interactivas
+streamlit>=1.32.0
+plotly>=5.19.0
+
+# Utilidades y Pruebas
+python-dotenv>=1.0.1
+pytest>=8.0.0
