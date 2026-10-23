@@ -1,0 +1,30 @@
+# Entorno virtual y caché de Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+
+# Datos pesados y audios descargados (NO subir a Git)
+datos/crudos/*.csv
+datos/medios/*.mp3
+datos/medios/*.wav
+datos/procesados/*.parquet
+datos/procesados/*.csv
+!datos/crudos/.gitkeep
+!datos/medios/.gitkeep
+!datos/procesados/.gitkeep
+
+# Modelos entrenados pesados y logs
+modelos_guardados/*.joblib
+modelos_guardados/*.pkl
+!modelos_guardados/.gitkeep
+logs/*.log
+!logs/.gitkeep
+.env
+.DS_Store
+Thumbs.db
