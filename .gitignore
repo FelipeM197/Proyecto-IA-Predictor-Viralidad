@@ -28,3 +28,7 @@ logs/*.log
 .env
 .DS_Store
 Thumbs.db
+
+# Archivos de planeación interna local (no subir a GitHub)
+plan_maestro_detallado.md
+plan_*.md
