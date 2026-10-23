@@ -74,17 +74,17 @@ Para garantizar máxima flexibilidad y facilidad de modificación durante el des
 
 ## 4. Componentes del Entorno y Archivos de Instalación
 
-El entorno de desarrollo está modularizado con los siguientes archivos base:
+El entorno de desarrollo cuenta con los archivos base de instalación, y cada integrante implementará los módulos de configuración y scripts utilitarios:
 
-| Archivo | Tipo | ¿Qué hace y para qué sirve? |
+| Archivo | Estado / Tipo | ¿Qué hace y para qué sirve? |
 | :--- | :--- | :--- |
-| [`pyproject.toml`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/pyproject.toml) | Empaquetado Moderno (PEP 517/621) | Permite instalar el proyecto como paquete local editable (`pip install -e .`). Evita errores de `ModuleNotFoundError` al importar módulos de `src` desde cualquier carpeta o notebook. |
-| [`requirements.txt`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/requirements.txt) | Manifiesto de Dependencias | Lista todas las bibliotecas de Python con sus versiones congeladas (DSP, ML, UI, LLM y Testing) para asegurar reproducibilidad exacta en cualquier computadora. |
-| [`.env.example`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/.env.example) | Plantilla de Entorno | Documenta las variables de entorno configurables (puerto y modelo de Ollama, timeouts de red y duración de audio) sin exponer secretos ni datos locales en el control de versiones. |
-| [`config/settings.py`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/config/settings.py) | Núcleo de Configuración | Centraliza rutas dinámicas (`pathlib.Path`), parámetros de la Transformada de Fourier (`N_FFT`, `HOP_LENGTH`), tasa de muestreo y semillas aleatorias. |
-| [`config/logging_config.py`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/config/logging_config.py) | Sistema de Registro | Reemplaza llamadas informales a `print()` por un registro formal de eventos en consola y en el archivo rotativo `logs/sistema.log`. |
-| [`scripts/init_dirs.py`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/scripts/init_dirs.py) | Constructor de Carpetas | Script utilitario que asegura la existencia de los directorios de datos crudos, medios y modelos guardados en instalaciones nuevas. |
-| [`scripts/check_environment.py`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/scripts/check_environment.py) | Auditor de Diagnóstico | Verifica en segundos que Python sea $\ge 3.10$, que el binario de `FFmpeg` esté activo en el sistema y que el servidor de `Ollama` esté respondiendo. |
+| [`pyproject.toml`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/pyproject.toml) | **Base Instalada** (PEP 517/621) | Permite instalar el proyecto como paquete local editable (`pip install -e .`). Evita errores de `ModuleNotFoundError` al importar módulos de `src` desde cualquier carpeta o notebook. |
+| [`requirements.txt`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/requirements.txt) | **Base Instalada** (Dependencias) | Lista todas las bibliotecas de Python con sus versiones congeladas (DSP, ML, UI, LLM y Testing) para asegurar reproducibilidad exacta en cualquier computadora. |
+| [`.env.example`](file:///c:/Users/MEGAPC/Desktop/Predictor_Engagement-IA/Proyecto-IA-Predictor-Viralidad/.env.example) | **Base Instalada** (Plantilla) | Documenta las variables de entorno configurables (puerto y modelo de Ollama, timeouts de red y duración de audio) sin exponer secretos ni datos locales en el control de versiones. |
+| `config/settings.py` | *Entregable Rol 1* (Configuración) | Centraliza rutas dinámicas (`pathlib.Path`), parámetros de la Transformada de Fourier (`N_FFT`, `HOP_LENGTH`), tasa de muestreo y semillas aleatorias. |
+| `config/logging_config.py` | *Entregable Rol 1* (Registro) | Reemplaza llamadas informales a `print()` por un registro formal de eventos en consola y en el archivo rotativo `logs/sistema.log`. |
+| `scripts/init_dirs.py` | *Entregable Rol 2* (Directorios) | Script utilitario que asegura la existencia de los directorios de datos crudos, medios y modelos guardados en instalaciones nuevas. |
+| `scripts/check_environment.py` | *Entregable Rol 3* (Diagnóstico) | Verifica en segundos que Python sea $\ge 3.10$, que el binario de `FFmpeg` esté activo en el sistema y que el servidor de `Ollama` esté respondiendo. |
 
 ---
 
@@ -129,7 +129,7 @@ cp .env.example .env
 ```
 
 ### Paso 5: Auditar el entorno y dependencias del sistema
-Ejecuta el script de diagnóstico para verificar que `FFmpeg` y `Python` estén listos:
+Una vez implementado `scripts/check_environment.py` por el Rol 3, ejecuta el script de diagnóstico para verificar que `FFmpeg` y `Python` estén listos:
 ```bash
 python scripts/check_environment.py
 ```
