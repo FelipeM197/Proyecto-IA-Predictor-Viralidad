@@ -1,4 +1,4 @@
-# Entorno virtual y caché de Python
+# Entorno virtual y cache de Python
 .venv/
 venv/
 env/
@@ -8,6 +8,10 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+
+# Configuraciones y carpetas de agentes
+.agents/
+.antigravity/
 
 # Datos pesados y audios descargados (NO subir a Git)
 datos/crudos/*.csv
@@ -29,6 +33,6 @@ logs/*.log
 .DS_Store
 Thumbs.db
 
-# Archivos de planeación interna local (no subir a GitHub)
+# Archivos de planeacion interna local (no subir a GitHub)
 plan_maestro_detallado.md
 plan_*.md
