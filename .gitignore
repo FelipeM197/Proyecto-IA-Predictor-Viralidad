@@ -32,5 +32,6 @@ logs/*.log
 Thumbs.db
 
 # Archivos de planeacion interna local (no subir a GitHub)
+plan/
 plan_maestro_detallado.md
 plan_*.md
