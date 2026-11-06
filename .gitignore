@@ -14,13 +14,11 @@ dist/
 .antigravity/
 
 # Datos pesados y audios descargados (NO subir a Git)
-datos/crudos/*.csv
-datos/medios/*.mp3
-datos/medios/*.wav
-datos/procesados/*.parquet
-datos/procesados/*.csv
+datos/crudos/*
 !datos/crudos/.gitkeep
+datos/medios/*
 !datos/medios/.gitkeep
+datos/procesados/*
 !datos/procesados/.gitkeep
 
 # Modelos entrenados pesados y logs
