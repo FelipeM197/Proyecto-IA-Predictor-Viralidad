@@ -1,0 +1,137 @@
+/* =====================================================================
+   Hoja de estilos - Predictor de Viralidad por Audio (Fase 8)
+   Paleta: fondos oscuros + acentos verde neon y violeta
+   ===================================================================== */
+
+:root {
+    /* Fondos oscuros */
+    --color-fondo: #0d0f14;
+    --color-fondo-secundario: #151821;
+    --color-tarjeta: #1b1f2b;
+    --color-borde: #2a2f3d;
+
+    /* Acentos */
+    --color-verde: #22c55e;
+    --color-verde-claro: #4ade80;
+    --color-violeta: #8b5cf6;
+    --color-violeta-claro: #a78bfa;
+    --gradiente-marca: linear-gradient(135deg, var(--color-verde) 0%, var(--color-violeta) 100%);
+
+    /* Semaforo de diagnostico */
+    --color-alerta: #f59e0b;
+    --color-critico: #ef4444;
+
+    /* Texto */
+    --color-texto: #e5e7eb;
+    --color-texto-suave: #9ca3af;
+
+    /* Geometria */
+    --radio-tarjeta: 14px;
+    --sombra-tarjeta: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --transicion: all 0.25s ease;
+}
+
+/* ---------- Lienzo general ---------- */
+.stApp {
+    background: radial-gradient(circle at top left, #1a1530 0%, var(--color-fondo) 45%);
+    color: var(--color-texto);
+}
+
+section[data-testid="stSidebar"] {
+    background-color: var(--color-fondo-secundario);
+    border-right: 1px solid var(--color-borde);
+}
+
+h1, h2, h3 { color: var(--color-texto); letter-spacing: -0.02em; }
+
+/* ---------- Encabezado principal ---------- */
+.titulo-app {
+    font-size: 2.4rem;
+    font-weight: 800;
+    background: var(--gradiente-marca);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.2rem;
+}
+
+.subtitulo-app { color: var(--color-texto-suave); font-size: 1.05rem; margin-bottom: 1.5rem; }
+
+/* ---------- Tarjetas ---------- */
+.tarjeta {
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-tarjeta);
+    box-shadow: var(--sombra-tarjeta);
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1rem;
+    transition: var(--transicion);
+}
+
+.tarjeta:hover { border-color: var(--color-violeta); transform: translateY(-2px); }
+
+.tarjeta-titulo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-verde-claro);
+    margin-bottom: 0.4rem;
+}
+
+.tarjeta-texto { color: var(--color-texto-suave); font-size: 0.95rem; }
+
+.tarjeta-violeta { border-left: 4px solid var(--color-violeta); }
+.tarjeta-verde   { border-left: 4px solid var(--color-verde); }
+.tarjeta-alerta  { border-left: 4px solid var(--color-alerta); }
+.tarjeta-critica { border-left: 4px solid var(--color-critico); }
+
+.lista-consejos { margin: 0.8rem 0 0 1.1rem; color: var(--color-texto); line-height: 1.6; }
+.lista-consejos li { margin-bottom: 0.5rem; }
+.lista-consejos li::marker { color: var(--color-verde-claro); font-weight: 700; }
+
+.aviso-demo {
+    background: rgba(139, 92, 246, 0.12);
+    border: 1px dashed var(--color-violeta);
+    border-radius: var(--radio-tarjeta);
+    padding: 0.8rem 1rem;
+    color: var(--color-violeta-claro);
+    margin-bottom: 1rem;
+}
+
+/* ---------- Insignias de estado ---------- */
+.insignia {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.insignia-ok    { background: rgba(34, 197, 94, 0.15);  color: var(--color-verde-claro); }
+.insignia-error { background: rgba(239, 68, 68, 0.15);  color: var(--color-critico); }
+
+/* ---------- Metricas nativas de Streamlit ---------- */
+div[data-testid="stMetric"] {
+    background-color: var(--color-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-tarjeta);
+    padding: 0.8rem 1rem;
+}
+
+div[data-testid="stMetricValue"] { color: var(--color-violeta-claro); }
+
+/* ---------- Botones ---------- */
+.stButton > button {
+    background: var(--gradiente-marca);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 0.55rem 1.4rem;
+    transition: var(--transicion);
+}
+
+.stButton > button:hover { filter: brightness(1.15); box-shadow: 0 0 16px rgba(139, 92, 246, 0.45); }
+
+/* ---------- Pestanas ---------- */
+.stTabs [data-baseweb="tab"] { color: var(--color-texto-suave); font-weight: 600; }
+.stTabs [aria-selected="true"] { color: var(--color-verde-claro) !important; }
+.stTabs [data-baseweb="tab-highlight"] { background-color: var(--color-violeta); }

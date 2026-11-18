@@ -102,3 +102,36 @@ PLIEGUES_CV = 5
 PERCENTIL_CORTE_VIRAL = 0.85
 PERCENTILES_UMBRALES = (25, 50, 75)
 TOP_K_ATRIBUTOS_SHAP = 3
+
+
+# Agente LLM local (Fase 7): llama3.2:1b por bajo consumo de RAM
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
+OLLAMA_TEMPERATURA = float(os.getenv("OLLAMA_TEMPERATURA", "0.2"))
+OLLAMA_MAX_TOKENS = int(os.getenv("OLLAMA_MAX_TOKENS", "400"))
+OLLAMA_TIMEOUT_SEC = float(os.getenv("OLLAMA_TIMEOUT_SEC", "60"))
+OLLAMA_TIMEOUT_PING_SEC = float(os.getenv("OLLAMA_TIMEOUT_PING_SEC", "3"))
+
+# Interfaz Streamlit (Fase 8)
+FORMATOS_AUDIO_UI = ["mp3", "wav", "ogg", "flac", "m4a"]
+MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "25"))
+PUNTOS_ONDA_UI = 2000
+
+# Agente: reglas deterministas de deteccion (Tarea 7.1)
+UMBRAL_SILENCIO_CRITICO_SEC = 0.35
+# Rangos de referencia del plan maestro, usados mientras no exista umbrales_virales.json
+UMBRALES_REFERENCIA = {
+    "tempo_bpm": {"p25": 115.0, "p50": 122.0, "p75": 132.0, "media": 122.0},
+    "initial_silence_sec": {"p25": 0.0, "p50": 0.12, "p75": 0.35, "media": 0.16},
+}
+
+# Graficos de resultados (Tarea 8.2)
+ENGAGEMENT_MAX_GAUGE_PCT = 20.0
+NUM_BARRAS_SHAP = 10
+RANGOS_RADAR = {  # (minimo, maximo) fisicos para normalizar cada eje a [0, 1]
+    "tempo_bpm": (60.0, 180.0),
+    "rms_mean": (0.0, 0.4),
+    "spectral_centroid": (500.0, 5000.0),
+    "beat_regularity": (0.0, 1.0),
+    "initial_silence_sec": (0.0, 2.0),
+}
