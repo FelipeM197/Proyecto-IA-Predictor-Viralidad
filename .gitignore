@@ -25,8 +25,10 @@ datos/procesados/*
 modelos_guardados/*.joblib
 modelos_guardados/*.pkl
 !modelos_guardados/.gitkeep
+logs/
 logs/*.log
 !logs/.gitkeep
+*.log
 .env
 .DS_Store
 Thumbs.db
@@ -35,3 +37,5 @@ Thumbs.db
 plan/
 plan_maestro_detallado.md
 plan_*.md
+plan.zip
+*.zip

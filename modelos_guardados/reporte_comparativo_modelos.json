@@ -1,0 +1,45 @@
+{
+  "modelo_seleccionado_produccion": "xgboost",
+  "mejor_modelo_test": "elasticnet",
+  "metricas_test": {
+    "ridge": {
+      "MAE": 0.008690660302044058,
+      "RMSE": 0.010944122941391984,
+      "R2": 0.21893951128936207
+    },
+    "elasticnet": {
+      "MAE": 0.008573478789181788,
+      "RMSE": 0.010698914031146744,
+      "R2": 0.2535475662086639
+    },
+    "mlp": {
+      "MAE": 0.012307055126853561,
+      "RMSE": 0.015470568734625632,
+      "R2": -0.5607570381885476
+    },
+    "random_forest": {
+      "MAE": 0.008848104228065224,
+      "RMSE": 0.010888889431180857,
+      "R2": 0.22680343058829888
+    },
+    "xgboost": {
+      "MAE": 0.008934573117170401,
+      "RMSE": 0.011011548236468908,
+      "R2": 0.2092858442354968
+    }
+  },
+  "optimizacion_cv": {
+    "mejores_parametros": {
+      "learning_rate": 0.03,
+      "max_depth": 3,
+      "n_estimators": 100
+    },
+    "mejor_rmse_cv": 0.011642132752961564,
+    "pliegues_cv": 5,
+    "total_combinaciones": 18
+  },
+  "fuente_datos": "respaldo_tiktok_csv",
+  "n_train": 560,
+  "n_val": 120,
+  "n_test": 120
+}
