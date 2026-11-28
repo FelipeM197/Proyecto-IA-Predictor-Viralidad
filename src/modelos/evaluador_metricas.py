@@ -224,9 +224,9 @@ def ejecutar_pipeline_entrenamiento(
         metricas_test, key=lambda nombre: metricas_test[nombre]["RMSE"]
     )
 
-    # Orquestador de inferencia y TreeExplainer consumen XGBRegressor en produccion
+    # Selecciona dinamicamente el modelo con menor RMSE en test para produccion
     reporte: dict[str, object] = {
-        "modelo_seleccionado_produccion": "xgboost",
+        "modelo_seleccionado_produccion": mejor_modelo_test,
         "mejor_modelo_test": mejor_modelo_test,
         "metricas_test": metricas_test,
         "optimizacion_cv": resumen_cv,
@@ -239,18 +239,18 @@ def ejecutar_pipeline_entrenamiento(
     if guardar_artefactos:
         red_mlp.guardar(settings.RUTA_MODELO_MLP)
         settings.RUTA_MODELO_XGBOOST.parent.mkdir(parents=True, exist_ok=True)
-        joblib.dump(modelo_xgb, settings.RUTA_MODELO_XGBOOST)
+        joblib.dump(modelos_evaluacion[mejor_modelo_test], settings.RUTA_MODELO_XGBOOST)
         guardar_reporte_comparativo(reporte, settings.RUTA_REPORTE_MODELOS)
 
     logger.info(
-        "Entrenamiento finalizado (%s) | n=%d/%d/%d | mejor_test=%s | RMSE_XGB=%.4f | R2_XGB=%.4f",
+        "Entrenamiento finalizado (%s) | n=%d/%d/%d | produccion=%s | RMSE=%.4f | R2=%.4f",
         fuente_datos,
         len(x_train),
         len(x_val),
         len(x_test),
         mejor_modelo_test,
-        metricas_test["xgboost"]["RMSE"],
-        metricas_test["xgboost"]["R2"],
+        metricas_test[mejor_modelo_test]["RMSE"],
+        metricas_test[mejor_modelo_test]["R2"],
     )
     return reporte
 

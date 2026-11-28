@@ -103,10 +103,16 @@ def explicar_prediccion_individual(
 ) -> dict[str, object]:
     df_entrada, nombres = _normalizar_vector_individual(vector_escalado, nombres_columnas)
 
-    explicador = shap.TreeExplainer(modelo)
-    valores_shap = np.asarray(explicador.shap_values(df_entrada), dtype=float).reshape(-1)
-    # shap actualiza expected_value tras calcular shap_values en XGBoost y unifica escalar/arreglo
-    valor_base = float(np.asarray(explicador.expected_value).reshape(-1)[0])
+    if hasattr(modelo, "coef_") and hasattr(modelo, "intercept_"):
+        # Para modelos lineales regularizados (ElasticNet/Ridge), la contribucion exacta es coef * x_escalado
+        valor_base = float(np.asarray(modelo.intercept_).reshape(-1)[0])
+        coef = np.asarray(modelo.coef_, dtype=float).reshape(-1)
+        valores_shap = coef * df_entrada.to_numpy(dtype=float).reshape(-1)
+    else:
+        explicador = shap.TreeExplainer(modelo)
+        valores_shap = np.asarray(explicador.shap_values(df_entrada), dtype=float).reshape(-1)
+        # shap actualiza expected_value tras calcular shap_values en XGBoost y unifica escalar/arreglo
+        valor_base = float(np.asarray(explicador.expected_value).reshape(-1)[0])
     if len(valores_shap) != len(nombres):
         raise ValueError(
             f"TreeExplainer retorno {len(valores_shap)} valores para {len(nombres)} atributos."
@@ -154,10 +160,14 @@ def calcular_importancia_global_shap(modelo, x_muestra) -> pd.DataFrame:
         )
         entrada = pd.DataFrame(arreglo, columns=nombres)
 
-    explicador = shap.TreeExplainer(modelo)
-    valores_shap = np.asarray(explicador.shap_values(entrada), dtype=float)
-    if valores_shap.ndim == 1:
-        valores_shap = valores_shap.reshape(1, -1)
+    if hasattr(modelo, "coef_") and hasattr(modelo, "intercept_"):
+        coef = np.asarray(modelo.coef_, dtype=float).reshape(1, -1)
+        valores_shap = entrada.to_numpy(dtype=float) * coef
+    else:
+        explicador = shap.TreeExplainer(modelo)
+        valores_shap = np.asarray(explicador.shap_values(entrada), dtype=float)
+        if valores_shap.ndim == 1:
+            valores_shap = valores_shap.reshape(1, -1)
 
     resumen = pd.DataFrame(
         {

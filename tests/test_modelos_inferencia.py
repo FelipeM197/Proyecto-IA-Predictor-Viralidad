@@ -146,11 +146,12 @@ def test_inferencia_vector_28_dimensiones_y_shap():
     n_negativos = sum(val < 0.0 for val in contribuciones.values())
     assert len(favorables) == min(settings.TOP_K_ATRIBUTOS_SHAP, n_positivos)
     assert len(perjudiciales) == min(settings.TOP_K_ATRIBUTOS_SHAP, n_negativos)
-    assert len(favorables) > 0 and len(perjudiciales) > 0
+    # Modelos lineales dispersos (ElasticNet) pueden activar solo contribuciones de un signo
+    assert len(favorables) + len(perjudiciales) > 0
     assert all(item["impacto_shap"] > 0.0 for item in favorables)
     assert all(item["impacto_shap"] < 0.0 for item in perjudiciales)
 
-    # Aditividad local exacta de TreeExplainer en escala logaritmica
+    # Aditividad local exacta en escala logaritmica (TreeExplainer o lineal)
     reconstruccion_log = float(explicacion["valor_base"]) + sum(contribuciones.values())
     assert np.isclose(reconstruccion_log, pred_log, atol=1e-4)
 

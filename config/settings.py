@@ -104,9 +104,9 @@ PERCENTILES_UMBRALES = (25, 50, 75)
 TOP_K_ATRIBUTOS_SHAP = 3
 
 
-# Agente LLM local (Fase 7): llama3.2:1b por bajo consumo de RAM
+# Agente LLM local (Fase 7): llama3.2:3b instalado en Ollama local
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:1b")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 OLLAMA_TEMPERATURA = float(os.getenv("OLLAMA_TEMPERATURA", "0.2"))
 OLLAMA_MAX_TOKENS = int(os.getenv("OLLAMA_MAX_TOKENS", "400"))
 OLLAMA_TIMEOUT_SEC = float(os.getenv("OLLAMA_TIMEOUT_SEC", "60"))

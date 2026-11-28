@@ -1,5 +1,5 @@
 {
-  "modelo_seleccionado_produccion": "xgboost",
+  "modelo_seleccionado_produccion": "elasticnet",
   "mejor_modelo_test": "elasticnet",
   "metricas_test": {
     "ridge": {
